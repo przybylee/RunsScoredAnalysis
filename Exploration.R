@@ -1,24 +1,43 @@
 #Lee Przybylski
 #9/26/2021
 library(ggplot2)
+library(plyr)
 
 #Data Exploration with runs scored data
 options(stringsAsFactors = FALSE)
-games <- read.csv("MLB2019.csv")
+games <- read.csv("mlbodds2021.csv")
 head(games)
-games$park <- paste(games$Home, "park", sep = "")
 summary(games)
-ggplot(games, aes(x= Home, y = Runs_Home)) + geom_boxplot()
+names(games)
+vars <- names(games)[c(1,3:21)]
+games <- games[,vars]
+head(games)
 
-#Model in home team runs 
-pois1 <- glm(Runs_Home ~ Home + Away, data = games, family = poisson(link = "log"))
-summary(pois1)
+#Assign year to each game 
+games$year <- 2021
 
-1-pchisq(deviance(pois1), 2370)
-#This shows there is evidence of overdispersion
+#Assign id number for each game
+N <- length(games$Date)
+gameID <- rep(1:(N/2), each = 2)
+games$gameID <- gameID
+tail(games)
 
-#Add park as a predictor
-pois2 <- glm(Runs_Home ~ Home + Away + park, data = games, family = poisson(link = "log"))
-summary(pois2)
+#Get opposing pitcher
+indx <- 0:(N-1)
+odds <- seq(from = 1, to = N , by = 2)
+indx[odds] = indx[odds] + 2
+indx
+games$OppPitcher <- games$Pitcher[indx]
+head(games)
 
-#We need to reshape the pdata
+#Get venues
+venue <- games$Team
+for (j in 1:N){
+  if (games$VH[j] == "V"){
+    venue[j] = games$Team[j+1]
+  }
+}
+games$Venue <- venue
+
+#Maybe add a sum of the first 5 innings for starting pitchers
+#Maybe add dates
