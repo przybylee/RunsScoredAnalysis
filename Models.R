@@ -6,9 +6,10 @@
 library(lme4)
 
 head(games)
-modelvars <- c("obsID", "Team", "Pitcher", "Opp", "OppPitcher", "Venue", "year",
+modelvars <- c("obsID", "gameID", "Team", "Pitcher", "Opp", "OppPitcher", "Venue", "year",
                "Final")
 df <- games[,modelvars]
+df$gameID <- as.factor(df$gameID)
 head(df)
 
 #First we consider team effects
@@ -55,16 +56,36 @@ print(tf - t0)
 #Ran for 23 minutes, got 3 warnings
 
 
-#Try a different optimizer to avoid warnings
+#Go with all random effects
 t0 <- Sys.time()
-poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|obsID),
+poiss5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue),
                 data = df, family = poisson(link= "log"), 
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
-summary(poiss5)
 tf <- Sys.time()
 print(tf - t0)
+summary(poiss5)
+#Fit 6 seconds
+
+#Go with all random effects, including per game
+t0 <- Sys.time()
+poiss5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue) + (1|gameID),
+                data = df, family = poisson(link= "log"), 
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+tf <- Sys.time()
+print(tf - t0)
+summary(poiss5)
+#Fit 6 seconds
 
 
+#Try a different optimizer to avoid warnings
+t0 <- Sys.time()
+poiss6 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID),
+                data = df, family = poisson(link= "log"), 
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+tf <- Sys.time()
+print(tf - t0)
+summary(poiss6)
+#Gave a singular fit 23 minutes
 
 
 
