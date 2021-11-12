@@ -55,6 +55,14 @@ print(tf - t0)
 #Ran for 23 minutes, got 3 warnings
 
 
+#Try a different optimizer to avoid warnings
+t0 <- Sys.time()
+poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|obsID),
+                data = df, family = poisson(link= "log"), 
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+summary(poiss5)
+tf <- Sys.time()
+print(tf - t0)
 
 
 
