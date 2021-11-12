@@ -52,6 +52,9 @@ poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|obsID),
 summary(poiss5)
 tf <- Sys.time()
 print(tf - t0)
+#Ran for 23 minutes, got 3 warnings
+
+
 
 
 
