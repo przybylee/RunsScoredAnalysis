@@ -2,7 +2,7 @@
 #11-11-2021
 
 #Fit a generalized linear model or generalized linear mixed effects model
-
+source("DataFormatting.R")
 library(lme4)
 
 head(games)
@@ -18,7 +18,7 @@ summary(poiss1)
 length(poiss1$coefficients)
 exp(poiss1$coefficients)
 sort(unique(df$Team))
-#Boston, Tabpa, LA, and Toronto had the highest means
+#Boston, Tampa, LA, and Toronto had the highest means
 
 #Check for overdispersion
 1-pchisq(deviance(poiss1), df.residual(poiss1))
@@ -41,14 +41,18 @@ summary(poiss3)
 
 #Make each starting pitcher have a random effect and add a random effect for each
 #game.  First as a prereq, do a simple model with team and random effect
+t0 <- Sys.time()
 poiss4 <- glmer(Final ~ Team + (1|obsID), data = df, 
-                family = poisson(link= "log"))
-summary(poiss4)
+                family = poisson(link= "log"),
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+tf <- Sys.time()
+print(tf-t0)
+#summary(poiss4)
 #Variance of obsID random effects is 0.2531
 
 #This will take a minute
 t0 <- Sys.time()
-poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|obsID),
+poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID)+ (1|obsID),
               data = df, family = poisson(link= "log"))
 summary(poiss5)
 tf <- Sys.time()
@@ -58,33 +62,34 @@ print(tf - t0)
 
 #Go with all random effects
 t0 <- Sys.time()
-poiss5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue),
+poiss5.5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue)+ 
+                  (1|gameID)+ (1|obsID),
                 data = df, family = poisson(link= "log"), 
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
-summary(poiss5)
+#summary(poiss5.5)
 #Fit 6 seconds
 
 #Go with all random effects, including per game
 t0 <- Sys.time()
-poiss5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue) + (1|gameID),
+poiss6 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue) + (1|gameID),
                 data = df, family = poisson(link= "log"), 
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
-summary(poiss5)
+#summary(poiss5)
 #Fit 6 seconds
 
 
 #Try a different optimizer to avoid warnings
 t0 <- Sys.time()
-poiss6 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID),
+poiss7 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID),
                 data = df, family = poisson(link= "log"), 
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
-summary(poiss6)
+#summary(poiss6)
 #Gave a singular fit 23 minutes
 
 

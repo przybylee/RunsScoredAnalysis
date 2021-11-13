@@ -5,7 +5,7 @@ library(plyr)
 
 #Data Exploration with runs scored data
 options(stringsAsFactors = FALSE)
-games <- read.csv("mlbodds2021.csv")
+games <- read.csv("Data/mlbodds2021.csv")
 head(games)
 summary(games)
 names(games)
