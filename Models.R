@@ -57,8 +57,24 @@ poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID)+ (1|obs
 summary(poiss5)
 tf <- Sys.time()
 print(tf - t0)
-#Ran for 23 minutes, got 3 warnings
+#Ran for 34 minutes, got 3 warnings
+#Warning messages:
+#  1: In (function (fn, par, lower = rep.int(-Inf, n), upper = rep.int(Inf,  :
+ # failure to converge in 10000 evaluations
+#  2: In optwrap(optimizer, devfun, start, rho$lower, control = control,  :
+ #  convergence code 4 from Nelder_Mead: failure to converge in 10000 evaluations
+#  3: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
+ #     Model failed to converge with max|grad| = 0.0838467 (tol = 0.002, component 1)
 
+#Reattempted with different optimizer
+t0 <- Sys.time()
+poiss5 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID)+ (1|obsID),
+                data = df, family = poisson(link= "log"), 
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+tf <- Sys.time()
+print(tf-t0)
+#Fit in 35 minutes
+#Singular fit, var of OppPitcher is 0
 
 #Go with all random effects
 t0 <- Sys.time()
@@ -89,7 +105,7 @@ poiss7 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID),
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
-#summary(poiss6)
+summary(poiss7)
 #Gave a singular fit 23 minutes
 
 
