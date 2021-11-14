@@ -106,7 +106,8 @@ poiss7 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID),
 tf <- Sys.time()
 print(tf - t0)
 summary(poiss7)
-#Gave a singular fit 23 minutes
+
+anova(poiss6, poiss7)
 
 
 
