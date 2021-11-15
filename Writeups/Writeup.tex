@@ -30,6 +30,7 @@
 \newcommand{\Exp}{\mathbb{E}}
 \newcommand{\Prob}{\mathbb{P}}
 \newcommand{\simind}{\overset{\text{ind}}{\sim}}
+\newcommand{\simiid}{\overset{\text{iid}}{\sim}}
 \DeclareMathOperator{\diag}{diag}
 \title{Measuring the Effects of Starting Pitching}
 \author{Lee Przybylski}
@@ -49,7 +50,11 @@ Most of our data will be taken from \href{https://www.sportsbookreviewsonline.co
 
 \subsection{Overdispersion}
 
-\subsection{Predictive Value}
+\subsection{Predictive Value of the Model}
+Let $y_{ijklm}$ be the number of runs scored by team $i$ against team $j$ at venue $k$ facing starting pitcher $l$ during the $m$th game of the season.  The model we propose assumes that $y_{ijklm}\sim\text{Poisson}(\lambda_{ijklm})$ where
+\[\log(\lambda_{ijklm}) = \mu + \tau_i + \delta_j + \rho_k +\chi_{im}+ p_l + g_m,\]
+\[p_l\simiid N(0, \sigma^2_p),\:\:g_m\simiid N(0, \sigma^2_g).\]
+
 
 \section{Pitcher Effects}
 

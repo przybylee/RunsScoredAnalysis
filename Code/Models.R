@@ -2,7 +2,7 @@
 #11-11-2021
 
 #Fit a generalized linear model or generalized linear mixed effects model
-source("DataFormatting.R")
+source("Code/DataFormatting.R")
 library(lme4)
 
 head(games)
@@ -10,6 +10,7 @@ modelvars <- c("obsID", "gameID", "Team", "Pitcher", "Opp", "OppPitcher", "Venue
                "Final")
 df <- games[,modelvars]
 df$gameID <- as.factor(df$gameID)
+df$home <- ifelse(df$Team == df$Venue, 1, 0)
 head(df)
 
 #First we consider team effects
@@ -26,18 +27,32 @@ sort(unique(df$Team))
 
 #Add effects for the defense and the venue
 poiss2 <- glm(Final ~ Team + Opp + Venue, data = df, family = poisson(link= "log"))
-summary(poiss2)
+#summary(poiss2)
 #Check for overdispersion
-1-pchisq(deviance(poiss2), df.residual(poiss1))
+#1-pchisq(deviance(poiss2), df.residual(poiss1))
+#Not a good fit according to deviance residuals
+
+#Same, but with home field advantage
+poiss2.5 <- glm(Final ~ Team + Opp + Venue + home, data = df, family = poisson(link= "log"))
+#summary(poiss2)
+#Check for overdispersion
+#1-pchisq(deviance(poiss2), df.residual(poiss1))
 #Not a good fit according to deviance residuals
 
 #Add effects for the opposing starting pitcher
 poiss3 <- glm(Final ~ Team + Opp + Venue + OppPitcher,
               data = df, family = poisson(link= "log"))
-summary(poiss3)
+#summary(poiss3)
 #Check for overdispersion
-1-pchisq(deviance(poiss3), df.residual(poiss3))
+#1-pchisq(deviance(poiss3), df.residual(poiss3))
 #Not a good fit according to deviance residuals
+
+#Same but with home field advantage
+poiss3.5 <- glm(Final ~ Team + Opp + Venue + OppPitcher + home,
+              data = df, family = poisson(link= "log"))
+summary(poiss3.5)
+#Check for overdispersion
+#1-pchisq(deviance(poiss3), df.residual(poiss3))
 
 #Make each starting pitcher have a random effect and add a random effect for each
 #game.  First as a prereq, do a simple model with team and random effect
@@ -105,7 +120,17 @@ poiss7 <- glmer(Final ~ Team + Opp + Venue + (1|OppPitcher) + (1|gameID),
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
+#Takes about 23 minutes to fit
 summary(poiss7)
+
+#Same thing with homefield advantage
+t0 <- Sys.time()
+poiss7.5 <- glmer(Final ~ Team + Opp + Venue + home + (1|OppPitcher) + (1|gameID),
+                data = df, family = poisson(link= "log"), 
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+tf <- Sys.time()
+print(tf - t0)
+#Takes about 23 minutes to fit
 
 anova(poiss6, poiss7)
 
