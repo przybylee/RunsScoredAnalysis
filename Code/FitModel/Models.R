@@ -36,7 +36,7 @@ poiss3 <- glm(Final ~ Team + Opp + Venue + OppPitcher,
               data = df, family = poisson(link= "log"))
 summary(poiss3)
 #Check for overdispersion
-1-pchisq(deviance(poiss3), df.residual(poiss3))
+1-pchisq(deviance(poiss3.5), df.residual(poiss3.5))
 #Not a good fit according to deviance residuals
 
 #Make each starting pitcher have a random effect and add a random effect for each
@@ -78,13 +78,13 @@ print(tf-t0)
 
 #Go with all random effects
 t0 <- Sys.time()
-poiss5.5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue)+ 
+poiss5.5 <- glmer(Final ~ (1|Team) + (1|Opp) + (1|OppPitcher) + (1|Venue) + 
                   (1|gameID)+ (1|obsID),
                 data = df, family = poisson(link= "log"), 
                 control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
-#summary(poiss5.5)
+summary(poiss5.5)
 #Fit 6 seconds
 
 #Go with all random effects, including per game
