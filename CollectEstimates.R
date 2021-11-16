@@ -54,4 +54,4 @@ yhat3 <- predict(poiss7.5, re.form = ~ 0, type = "response")
 df1$pred3 <- yhat3
 head(df1)
 
-#When we bet, we must disregard
+#When we bet, we must disregard effects from gameID and 
