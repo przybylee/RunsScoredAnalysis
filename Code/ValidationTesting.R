@@ -6,7 +6,7 @@
 
 library(lme4)
 
-ssn <- 2019
+ssn <- 2015
 #source("Code/DataCleaning/DataFormatting.R")
 
 #unique(games$Date)
@@ -22,7 +22,9 @@ ssn <- 2019
 
 file <- paste("Data/RawData/mlbodds", ssn, ".csv", sep = "")
 games <- frmt_data(file, ssn)
-head(games)
+#2016 season had a problem with some scores = NL
+summary(games)
+#head(games)
 #Create an empty dataframe to track performance scores
 dfPerf <- data.frame(matrix(data = NA, nrow = 0, ncol = 13))
 
@@ -108,6 +110,6 @@ print(tf - t0)
 accOpen <- sum((games$Win <1) & (games$Open > 0))/length(games$Date)
 head(games)
 
-head(dfPerf)
+tail(dfPerf)
 file <- paste("Data/ModelPerformance/performance", ssn, ".csv", sep = "")
 write.table(dfPerf, file, row.names = F, col.names = T, sep = ",")

@@ -95,3 +95,5 @@ frmt_data <- function(file, ssn){
   games$home <- ifelse(games$Team == games$Venue, 1,0)
   return(games)
 }
+
+#Delete NYM at PIT on 6/06, for missing values
