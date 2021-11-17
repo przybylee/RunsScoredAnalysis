@@ -19,9 +19,12 @@ head(df)
 games$home <- ifelse(games$Team == games$Venue, 1,0)
 head(games)
 
+#Create an empty dataframe to track performance scores
+dfPerf <- data.frame(matrix(data = NA, nrow = 0, ncol = 13))
+
 #Train on all games before date0
 #Model did not converge well until 5/24
-
+t0 <- Sys.time()
 step <- 0.05
 cuts <- seq(from = 0.15, to = 1, by = step)
 cuts <- quantile(games$Date, cuts)
@@ -88,4 +91,12 @@ for (j in 1:J){
   scores <- c(N, obsrate, mean(abs(res1)), mean(abs(res2)), mean(abs(res3)),
               sqrt(mean(res1^2)), sqrt(mean(res2^2)), sqrt(mean(res3^2)),
               acc1, acc2, acc3, accOpen, accClose)
+  dfPerf <- rbind(dfPerf, scores)
 }
+names(dfPerf) <- c("Ngames", "obsrate", paste("MAE", 1:3, sep = ""),
+                   paste("RMSE", 1:3, sep = ""), paste("Acc", 1:3, sep = ""),
+                   "AccOpen", "AccClose")
+tf <- Sys.time()
+print(tf - t0)
+
+#predictions based on opening moneyline are only accurate about 0.31!!!!

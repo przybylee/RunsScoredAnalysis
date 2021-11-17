@@ -61,7 +61,9 @@ Here we will elect to follow the second approach.
 
 \subsection{Predictive Value of the Model}
 Let $y_{ijklm}$ be the number of runs scored by team $i$ against team $j$ at venue $k$ facing starting pitcher $l$ during the $m$th game of the season.  The model we propose assumes that $y_{ijklm}\sim\text{Poisson}(\lambda_{ijklm})$ where
-\[\log(\lambda_{ijklm}) = \mu + \chi \mathbf{1}_{im} + b_i + f_j + v_k + p_l + g_m + e_{im},\]
+\begin{equation}\label{eq : model1}
+\log(\lambda_{ijklm}) = \mu + \chi \mathbf{1}_{im} + b_i + f_j + v_k + p_l + g_m + e_{im},
+\end{equation}
 \[b_i\simiid N(0,\sigma^2_b), f_j\simiid N(0,\sigma^2_f), v_k\simiid N(0,\sigma^2_v), p_l\simiid N(0, \sigma^2_p),\:\:g_m\simiid N(0, \sigma^2_g), e_{im}\simiid N(0,\sigma^2_e).\]
 \[\mathbf{1}_{im} = \begin{cases}
 1 & \text{if team}\:i\:\text{is home during game}\:m\\
