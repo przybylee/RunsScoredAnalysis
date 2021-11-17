@@ -91,3 +91,15 @@ exp(lambda)
 #Everything matches, Colorado got better when we removed the obsID effect, 
 #Which suggests they had a significantly below average game
 
+#If we add a new pitcher, then we still want to get a prediction
+sampledf$OppPitcher[1] <- "LPRZYBYLSKI"
+sampledf
+pred3 <- predict(poiss3, re.form = ~ (1| Team) + (1| Opp) + (1|Venue)
+                 + (1|OppPitcher), newdata = sampledf, allow.new.levels = TRUE,
+                 type = "response")
+sampledf$pred3 <- pred3
+#How would COL do with no conditioning on pitcher
+b <- ranef(poiss3)$Team["COL", 1]
+f <- ranef(poiss3)$Opp["LAD", 1]
+lambda <- mu  + v + b + f 
+exp(lambda)
