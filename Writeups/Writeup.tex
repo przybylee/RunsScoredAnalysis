@@ -50,10 +50,23 @@ Most of our data will be taken from \href{https://www.sportsbookreviewsonline.co
 
 \subsection{Overdispersion}
 
+When we use regression to fit a generalized linear model (GLM) with an exponential family of distributions, it is usually the case that the variance of our distribution is a function of the mean of the distribution.  Recall that a Poisson distribution with mean $\lambda>0$, denoted $\text{poiss}(\lambda)$, has pmf
+\[f(x) = \frac{e^{-\lambda}\lambda^x}{x!},\:\:x\in\N_0.\]
+Through a link function, we can use ordinary least squares to find an estimate for the mean based on the covariates, but often variance implied by this estimated mean is too small to explain the variation observed in the data.  When this happens, we say that the model has \emph{overdispersion}.  This must be accounted for in order to perform meaningful inference.  There are 2 common ways to deal with overdispersion.
+\begin{itemize}
+\item We can add a dispersion parameter to the model which is estimated using a quasi-likelihood approach.
+\item We can fit a generalized linear mixed effects model (GLMEM) where we assume the mean is also affected by a centered normal random variable. 
+\end{itemize}
+Here we will elect to follow the second approach.
+
 \subsection{Predictive Value of the Model}
 Let $y_{ijklm}$ be the number of runs scored by team $i$ against team $j$ at venue $k$ facing starting pitcher $l$ during the $m$th game of the season.  The model we propose assumes that $y_{ijklm}\sim\text{Poisson}(\lambda_{ijklm})$ where
-\[\log(\lambda_{ijklm}) = \mu + \tau_i + \delta_j + \rho_k +\chi_{im}+ p_l + g_m,\]
-\[p_l\simiid N(0, \sigma^2_p),\:\:g_m\simiid N(0, \sigma^2_g).\]
+\[\log(\lambda_{ijklm}) = \mu + \chi \mathbf{1}_{im} + b_i + f_j + v_k + p_l + g_m + e_{im},\]
+\[b_i\simiid N(0,\sigma^2_b), f_j\simiid N(0,\sigma^2_f), v_k\simiid N(0,\sigma^2_v), p_l\simiid N(0, \sigma^2_p),\:\:g_m\simiid N(0, \sigma^2_g), e_{im}\simiid N(0,\sigma^2_e).\]
+\[\mathbf{1}_{im} = \begin{cases}
+1 & \text{if team}\:i\:\text{is home during game}\:m\\
+0 &\text{otherwise}
+\end{cases}\]
 
 
 \section{Pitcher Effects}
