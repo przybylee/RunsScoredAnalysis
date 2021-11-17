@@ -6,26 +6,30 @@
 
 library(lme4)
 
-source("DataFormating.R")
+ssn <- 2019
+#source("Code/DataCleaning/DataFormatting.R")
 
-unique(games$Date)
-head(games)
-modelvars <- c("obsID", "gameID", "Team", "Pitcher", "Opp", "OppPitcher", "Venue", "year",
-               "Final")
-df <- games[,modelvars]
-df$gameID <- as.factor(df$gameID)
-df$home <- ifelse(df$Team == df$Venue, 1, 0)
-head(df)
-games$home <- ifelse(games$Team == games$Venue, 1,0)
-head(games)
+#unique(games$Date)
+#head(games)
+#modelvars <- c("obsID", "gameID", "Team", "Pitcher", "Opp", "OppPitcher", "Venue", "year",
+#               "Final")
+#df <- games[,modelvars]
+#df$gameID <- as.factor(df$gameID)
+#df$home <- ifelse(df$Team == df$Venue, 1, 0)
+#head(df)
+#games$home <- ifelse(games$Team == games$Venue, 1,0)
+#head(games)
 
+file <- paste("Data/RawData/mlbodds", ssn, ".csv", sep = "")
+games <- frmt_data(file, ssn)
+head(games)
 #Create an empty dataframe to track performance scores
 dfPerf <- data.frame(matrix(data = NA, nrow = 0, ncol = 13))
 
 #Train on all games before date0
 #Model did not converge well until 5/24
 t0 <- Sys.time()
-step <- 0.05
+step <- 0.025
 cuts <- seq(from = 0.15, to = 1, by = step)
 cuts <- quantile(games$Date, cuts)
 J <- length(cuts) -1
@@ -82,8 +86,8 @@ for (j in 1:J){
   wpred3 <- ifelse(dfval$pred3 > dfval$pred3[indx], 1, 0) 
   acc3 <- sum(wpred3 == dfval$Win)/length(dfval$Win)
   #Performance of the moneyline
-  accOpen <- sum((dfval$Win > 0) & (dfval$Open < 0))/N
-  accClose <- sum((dfval$Win > 0) & (dfval$Close < 0))/N
+  accOpen <- sum((dfval$Win < 1) & (dfval$Open > 0))/N
+  accClose <- sum((dfval$Win < 1) & (dfval$Close > 0))/N
 
   #Get win or lose
   games$Win <- ifelse(games$Final > games$OppScore, 1, 0)
@@ -92,6 +96,7 @@ for (j in 1:J){
               sqrt(mean(res1^2)), sqrt(mean(res2^2)), sqrt(mean(res3^2)),
               acc1, acc2, acc3, accOpen, accClose)
   dfPerf <- rbind(dfPerf, scores)
+  print(paste("Predicted up to", max(dfval$D), sep = " "))
 }
 names(dfPerf) <- c("Ngames", "obsrate", paste("MAE", 1:3, sep = ""),
                    paste("RMSE", 1:3, sep = ""), paste("Acc", 1:3, sep = ""),
@@ -100,3 +105,9 @@ tf <- Sys.time()
 print(tf - t0)
 
 #predictions based on opening moneyline are only accurate about 0.31!!!!
+accOpen <- sum((games$Win <1) & (games$Open > 0))/length(games$Date)
+head(games)
+
+head(dfPerf)
+file <- paste("Data/ModelPerformance/performance", ssn, ".csv", sep = "")
+write.table(dfPerf, file, row.names = F, col.names = T, sep = ",")
