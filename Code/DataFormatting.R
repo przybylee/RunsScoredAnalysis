@@ -1,11 +1,11 @@
 #Lee Przybylski
 #9/26/2021
-library(ggplot2)
-library(plyr)
+#library(ggplot2)
+#library(plyr)
 
 #Data Exploration with runs scored data
 options(stringsAsFactors = FALSE)
-games <- read.csv("Data/mlbodds2021.csv")
+games <- read.csv("Data/RawData/mlbodds2021.csv")
 head(games)
 summary(games)
 names(games)

@@ -20,7 +20,16 @@ dfmetrics[order(dfmetrics$FIP)[1:10],]
 #Top10 in WARP
 dfmetrics[order(dfmetrics$WARP)[rev((L-9):L)],]
 
+#Top10 in DRA
+dfmetrics[order(dfmetrics$DRA)[1:10],]
+
 #Top10 in SPR
 dfmetrics[order(dfmetrics$SPR)[1:10],]
 
+x <- dfmetrics$DRA
+y <- dfmetrics$SPR
+plot(x,y)
 
+x <- dfmetrics$ERA
+y <- dfmetrics$SPR
+plot(x,y)
