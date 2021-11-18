@@ -5,6 +5,7 @@
 #Fangraphs data selects starting pitchers with a min of 30 IP
 library(stringr)
 library(DataCombine)
+library(xtable)
 
 source("Code/Functions/frmt_data.R")
 
@@ -37,30 +38,37 @@ poiss3 <- glmer(Final ~ home + (1| Team) + (1| Opp) + (1|Venue) + (1|OppPitcher)
 #3. Create dataframe with blups and drop the cases where blups were not available 
 
 #Pitcher names are coded as first initial, last name, and -L if lefthanded
+pitchers$sbid <- "000"
 split_names <- str_split(pitchers$Name, " ", simplify = TRUE)
 finit <- substring(split_names[,1], 1, 1)
 codenames <- toupper(paste(finit, split_names[,2], sep = ""))
 eff_names <- rownames(ranef(poiss3)$OppPitcher)
 ind <- codenames %in% eff_names
 sum(ind)
-codenames[ind]
+pitchers$sbid[ind] <- codenames[ind]
+
 
 codenames_L <- paste(codenames, "-L", sep = "")
 ind_L <- codenames_L %in% eff_names
+sum(ind_L)
+pitchers$sbid[ind_L] <- codenames_L[ind_L]
 
 codenames_R <- paste(codenames, "-R", sep = "")
 ind_R <- codenames_R %in% eff_names
+pitchers$sbid[ind_R] <- codenames_L[ind_R]
 
-pitchers$idMatches <- as.numeric(ind) + as.numeric(ind_L) + as.numeric(ind_R)
 
+idMatches <- as.numeric(ind) + as.numeric(ind_L) + as.numeric(ind_R)
 
-#At this point, we select pitchers that have one of the codenames
-ind_tot <- ind | ind_L | ind_R 
-sum(ind_tot)
+#At this point, we select pitchers that have exactly one of the codenames
+head(pitchers, n = 20)
+keeps <- pitchers[idMatches == 1,]
+p_ls <- ranef(poiss3)$OppPitcher[keeps$sbid,1]
+keeps$SPR <- exp(p_ls) - 1
 
-pitchers_m <- pitchers[pitchers$idMatches == 1,]
-codenames
-
+#######################
+#More work to do here
+#Code for sorting out duplicates
 both <- ind_L & ind
 codenames[both]
 pitchers[both,]
