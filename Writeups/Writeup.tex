@@ -44,13 +44,15 @@
 
 \section{Introduction}
 
-Most of our data will be taken from \href{https://www.sportsbookreviewsonline.com/scoresoddsarchives/mlb/mlboddsarchives.htm}{sportsbookreviewsonline.com}
-\begin{figure}[h]
+When looking to wager on the outcome of a baseball game, your sports book will usually offer three options.  You can be the runline, which places a handicap on the teams based on their estimated margin of victory.  A team with a negative runline is favored to win.  You can bet the moneyline, where there is no restrictions on the margin of victory.  Your only objective is to bet on the team that wins.  The moneyline indicates how much risk you take on.  A favored team will have a negative moneyline, and its absolute value will equal the amount needed to wager in order to win \$100.  The underdog will have a positive moneyline and equal the the amount won for a successful \$100 wager.  Finaly, you can bet the over-under, which is like a runline in that you predict the total number of runs scored in the game.
+\begin{figure}[h!]
     \centering
     \includegraphics[scale = 0.7]{mlb-odds-2.png}
     %\caption{Caption}
     %\label{fig:my_label}
 \end{figure}
+
+We also see that the sportsbook indicates the probable starting pitchers.  We can build a regression model that will leverage the effects of starting pitchers to hopefully better predict the outcome of games.  Using the proper approach, we also can use predictors from this model to make better comparisons of starting pitchers while considering the context of who they are pitching against, where they are playing, and the quality of the defense behind them.  We will fit this model using sportsbook archive data  taken from \href{https://www.sportsbookreviewsonline.com/scoresoddsarchives/mlb/mlboddsarchives.htm}{sportsbookreviewsonline.com}.  We will compare our ratings of pitchers to other metrics such as ERA, FIP, WAR, and DRA as reported by \href{https://www.baseballprospectus.com/leaderboards/pitching/}{Baseball Prospectus}.
 
 \section{Model Selection}
 
@@ -65,7 +67,7 @@ Through a link function, we can use ordinary least squares to find an estimate f
 \end{itemize}
 Here we will elect to follow the second approach.
 
-\subsection{Predictive Value of the Model}
+\subsection{Model Definitions}
 Let $y_{ijklm}$ be the number of runs scored by team $i$ against team $j$ at venue $k$ facing starting pitcher $l$ during the $m$th game of the season.  The model we propose assumes that $y_{ijklm}\sim\text{Poisson}(\lambda_{ijklm})$ where
 \begin{equation}\label{eq : model1}
 \log(\lambda_{ijklm}) = \mu + \chi \mathbf{1}_{im} + b_i + f_j + v_k + p_l + g_m + e_{im},
@@ -76,6 +78,7 @@ Let $y_{ijklm}$ be the number of runs scored by team $i$ against team $j$ at ven
 0 &\text{otherwise}
 \end{cases}\]
 
+\subsection{Validation Testing}
 
 \section{Pitcher Effects}
 
