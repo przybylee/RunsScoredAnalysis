@@ -36,6 +36,10 @@ xtable(honDRA, digits = 3)
 honSPR <- cbind(rank, dfmetrics[order(dfmetrics$SPR)[1:10],vars])
 xtable(honSPR, digits = 3)
 
+#Bottom10 in SPR
+dishonSPR <- cbind(218:227, dfmetrics[order(dfmetrics$SPR)[218:227],vars])
+xtable(dishonSPR, digits = 3)
+
 #Correlation of the 5 metrics
 vars <- c("WARP", "ERA", "FIP", "DRA", "SPR")
 dfcorr <- keeps[,vars]
