@@ -1,5 +1,6 @@
 #This is an anlayis of the data created by PitcherMetrics.R
-
+#We examine the top rated pitchers under 4 metrics and 
+#compute the correlation between 5 metrics.  Includes vizualizations.
 library(tidyr)
 library(ggplot2)
 #library(reshape2)
