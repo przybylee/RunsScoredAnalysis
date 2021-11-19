@@ -3,42 +3,49 @@
 
 #Fit our 3 favorite glmer models
 #Demonstrate prediction functions
-source("Code/DataFormatting.R")
+#source("Code/DataFormatting.R")
 library(lme4)
+library(xtable)
 
-head(games)
-modelvars <- c("obsID", "gameID", "Team", "Pitcher", "Opp", "OppPitcher", "Venue", "year",
-               "Final")
-df <- games[,modelvars]
-df$gameID <- as.factor(df$gameID)
-df$home <- ifelse(df$Team == df$Venue, 1, 0)
+#Choose the season
+ssn <- 2021
+
+gamefile <- paste("Data/RawData/mlbodds", ssn, ".csv", sep = "")
+source("Code/Functions/frmt_data.R")
+df <- frmt_data(gamefile, ssn)
 head(df)
 
-#Naive Model
+#GLM
 t0 <- Sys.time()
-poiss1 <- glm(Final ~ Team + Opp + Venue, data = df, family = poisson(link= "log"))
+poiss1 <- glm(Final ~ Team + Opp + Venue + home-1, data = df, family = poisson(link= "log"))
 tf <- Sys.time()
 print(tf - t0)
 #Fits in less than a second
+summary(poiss1)
+coef(poiss1)
+#Read off the affect of each team, the third column is given in runs
+cbind(coef(poiss1), exp(coef(poiss1)), exp(coef(poiss1)+ coef(poiss1)[1]))
 
-#Fixed effects for teams and venue
+#GLME Reduced
 t0 <- Sys.time()
-poiss7.5 <- glmer(Final ~ Team + Opp + Venue + home + (1|OppPitcher) + (1|gameID),
+poiss2 <- glmer(Final ~ home + (1|Team) + (1|Opp) + (1|Venue),
                   data = df, family = poisson(link= "log"), 
                   control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0)
 #Takes about 26 minutes to fit
+summary(poiss2)
 
-#All random except home
+#GLME Full
 t0 <- Sys.time()
 poiss3 <- glmer(Final ~ home + (1| Team) + (1| Opp) + (1|Venue) + (1|OppPitcher) 
-                + (1|gameID) + (1| obsID), data = df, family = poisson())
+                + (1|gameID) + (1| obsID), data = df, family = poisson(),
+                control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 tf <- Sys.time()
 print(tf - t0) #fits in 25 seconds
 
 summary(poiss3)
-
+anova(poiss2,poiss3)
 
 head(df)
 

@@ -2,14 +2,13 @@
 #11/16/2021
 
 #Create a dataframe of pitchers with ERA, WAR, FIP from Fangraphs, and model estimates from our favorite model.
-#Fangraphs data selects starting pitchers with a min of 30 IP
-library(stringr)
-library(DataCombine)
-library(xtable)
+#library(stringr)
+#library(DataCombine)
+#library(xtable)
 
-source("Code/Functions/frmt_data.R")
+#source("Code/Functions/frmt_data.R")
 
-season <- 2021
+#season <- 2015
 file <- paste("Data/BaseballProspectus/bpexp", season, ".csv", sep = "")
 pitchers <- read.csv(file, header = TRUE, sep = ",")
 head(pitchers)
@@ -55,36 +54,19 @@ pitchers$sbid[ind_L] <- codenames_L[ind_L]
 
 codenames_R <- paste(codenames, "-R", sep = "")
 ind_R <- codenames_R %in% eff_names
-pitchers$sbid[ind_R] <- codenames_L[ind_R]
+pitchers$sbid[ind_R] <- codenames_R[ind_R]
 
 
 idMatches <- as.numeric(ind) + as.numeric(ind_L) + as.numeric(ind_R)
 
 #At this point, we select pitchers that have exactly one of the codenames
-head(pitchers, n = 20)
+#tail(pitchers, n = 20)
 keeps <- pitchers[idMatches == 1,]
 p_ls <- ranef(poiss3)$OppPitcher[keeps$sbid,1]
-keeps$SPR <- exp(p_ls) - 1
+keeps$SPR <- exp(p_ls)
+#head(keeps, n = 20)
 
-#######################
-#More work to do here
-#Code for sorting out duplicates
-both <- ind_L & ind
-codenames[both]
-pitchers[both,]
-#For pitchers in both, we distinguish them based on team
+#Save data with SPR column for the season
+file <- paste("Data/SPR_Data/Starters", season, ".csv", sep = "")
+write.table(keeps, file, row.names = FALSE, col.names = TRUE, sep = ",")
 
-ind_L <- ind_L & !ind
-sum(ind_L)
-
-
-ind_tot <- ind | ind_L
-sum(ind_tot)
-
-###############
-pitcher_search<- function(string){
-  char_min <- stringdist::stringdist(string, team_list)
-  indx <- which.min(char_min)
-  tm <- team_list[indx][1]
-  tm
-}
