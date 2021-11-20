@@ -3,7 +3,8 @@
 #compute the correlation between 5 metrics.  Includes vizualizations.
 library(tidyr)
 library(ggplot2)
-#library(reshape2)
+library(xtable)
+library(reshape2)
 
 ssn <- 2021
 
@@ -16,7 +17,7 @@ dfmetrics <- keeps[,vars]
 head(dfmetrics)
 L <- length(dfmetrics$Name)
 
-N <- 10
+N <- 20
 rank <- 1:N
 #Top10 in ERA
 honERA <- cbind(rank,dfmetrics[order(dfmetrics$ERA)[1:N],c("Name", "Team", "ERA", "SPR")])
@@ -36,18 +37,9 @@ xtable(honDRA, digits = 3)
 dfmetrics[order(dfmetrics$DRA)[1:10],]
 
 #Top10 in SPR
-honSPR <- cbind(rank, dfmetrics[order(dfmetrics$SPR)[1:10],vars])
+honSPR <- cbind(rank, dfmetrics[order(dfmetrics$SPR)[1:N],vars])
 xtable(honSPR, digits = 3)
 
-<<<<<<< HEAD
-x <- dfmetrics$DRA
-y <- dfmetrics$SPR
-plot(x,y)
-
-x <- dfmetrics$ERA
-y <- dfmetrics$SPR
-plot(x,y)
-=======
 #Bottom10 in SPR
 dishonSPR <- cbind(218:227, dfmetrics[order(dfmetrics$SPR)[218:227],vars])
 xtable(dishonSPR, digits = 3)
@@ -90,3 +82,4 @@ ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
         axis.title.y = element_blank())+
   coord_fixed()
 >>>>>>> 1630ea81628d1e5eee2ed4cba081159407433671
+
